@@ -1,0 +1,68 @@
+# ============================================================
+# 冻土-基础设施沉降预测实验 - 兜底配置
+# 仿真数据 - 仅供框架验证
+# ============================================================
+# ⚠️ 注意：仿真数据仅供框架验证，不代表真实冻土环境
+# 使用此配置时，所有结果均为仿真数据产出，不可直接用于论文
+
+# AutoDL云端路径策略：
+#   数据盘 /root/autodl-tmp (/dev/md0挂载点，大容量)
+#   代码可放系统盘 /root，数据和输出必须放数据盘
+#   DATA_ROOT自动检测：--data-root > $DATA_ROOT > /root/autodl-tmp > 项目根目录
+#   运行时路径解析：datasets/processed → DATA_ROOT/datasets/processed
+#                   outputs → DATA_ROOT/outputs
+#   GPU环境：RTX4090 | CUDA 13.0(driver) | PyTorch 2.4+cu12.4 | Python 3.12
+
+dataset_name: "simulation_fallback"
+data_source: "simulation"          # 明确标注为仿真数据
+region: "Simulation Fallback"
+description: "⚠️ 仿真数据仅供框架验证，不可用于论文结果"
+
+# 数据维度
+N_nodes: 40                        # 适中节点数
+T_steps: 120                       # 10年×12月=120月
+F_features: 12
+G_geo_features: 3
+T_in: 24
+T_out: 1
+train_ratio: 0.8
+
+# 随机种子
+seed: 42
+
+# 仿真数据参数
+noise_level: 0.05                  # 标准噪声水平
+k_thaw: 1.2                        # Stefan方程热导率 (W/m·K)
+
+# 物理损失权重
+lambda_phys: 0.3
+
+# 模型参数
+hidden_dim: 64
+num_heads: 4
+num_spatial_layers: 2
+dropout: 0.1
+
+# 训练参数
+epochs: 100                        # 兜底配置减少训练轮数
+lr: 0.001
+batch_size: 32
+
+# 空间邻接矩阵
+adj_threshold_km: 50
+
+# FiLM conditioning
+use_film: true
+use_phys_loss: true
+
+# 输出目录
+output_dir: "outputs"
+data_dir: "datasets/processed"
+raw_data_dir: "datasets/raw"
+
+# Baseline对比模型列表（兜底只跑核心baseline）
+baselines:
+  - st_gat
+  - stgcn
+  - pinn
+  - stefan

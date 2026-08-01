@@ -1,0 +1,69 @@
+# ============================================================
+# 冻土-基础设施沉降预测实验 - AutoDL GPU 正式配置
+# ============================================================
+# 🚀 此配置用于AutoDL GPU环境正式实验（200 epochs）
+# ⚡ GNN模型利用CUDA加速，预计训练时间：<10分钟（8模型全量）
+# 📊 结果可用于论文补充（仍为仿真数据，需替换为真实数据）
+
+# AutoDL云端路径策略：
+#   数据盘 /root/autodl-tmp (/dev/md0挂载点，大容量)
+#   代码可放系统盘 /root，数据和输出必须放数据盘
+#   DATA_ROOT自动检测：--data-root > $DATA_ROOT > /root/autodl-tmp > 项目根目录
+#   运行时路径解析：datasets/processed → DATA_ROOT/datasets/processed
+#                   outputs → DATA_ROOT/outputs
+#   GPU环境：RTX4090 | CUDA 13.0(driver) | PyTorch 2.4+cu12.4 | Python 3.12
+
+dataset_name: "autodl_gpu_simulation"
+data_source: "simulation"
+region: "Simulation Fallback (AutoDL GPU)"
+description: "AutoDL GPU环境正式实验 — 200 epochs全量训练"
+
+# 数据维度
+N_nodes: 40
+T_steps: 120
+F_features: 12
+G_geo_features: 3
+T_in: 24
+T_out: 1
+train_ratio: 0.8
+seed: 42
+
+# 仿真数据参数
+noise_level: 0.05
+k_thaw: 1.2
+
+# 物理损失权重
+lambda_phys: 0.3
+
+# 模型参数
+hidden_dim: 64
+num_heads: 4
+num_spatial_layers: 2
+cheb_K: 3              # Chebyshev阶数（ST-GCN用）
+diffusion_K: 2         # 扩散步数（DCRNN用）
+dropout: 0.1
+
+# 🚀 训练参数（GPU优化版）
+epochs: 200            # 正式实验200轮
+lr: 0.001
+batch_size: 32         # GPU可加大batch
+device: "cuda"         # 强制使用GPU
+
+# 空间邻接矩阵
+adj_threshold_km: 50
+
+# FiLM conditioning
+use_film: true
+use_phys_loss: true
+
+# 输出目录
+output_dir: "outputs"
+data_dir: "datasets/processed"
+raw_data_dir: "datasets/raw"
+
+# 全量模型列表
+baselines:
+  - st_gat
+  - stgcn
+  - pinn
+  - stefan

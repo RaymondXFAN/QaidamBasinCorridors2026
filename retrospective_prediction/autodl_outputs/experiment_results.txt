@@ -1,0 +1,23 @@
+Retrospective Prediction Experiment Results
+======================================================================
+
+Dataset: autodl_gpu_simulation
+Region: Simulation Fallback (AutoDL GPU)
+Data source: simulation
+Config: configs/autodl_gpu.yaml
+Time: 2026-08-01 13:18
+Dimensions: input_dim=12, geo_dim=3
+WARNING: Results based on simulation data (Stefan equation driven),
+         for framework validation only. Replace with real data for publication.
+
+Model                  RMSE(m)    MAE(m)     R2       PhysViol(%)    FiLMImp(%)     Status    
+----------------------------------------------------------------------------------------------
+Geo-FiLM ST-GAT        0.7449     0.5389     0.9801   99.0           -5.0           ok        
+Standard ST-GAT        0.7094     0.5391     0.9820   97.9           -              ok        
+ST-GCN                 0.7458     0.5658     0.9801   98.9           -              ok        
+DCRNN                  0.7568     0.5694     0.9795   99.1           -              ok        
+PINN-Permafrost        1.2903     1.0070     0.9000   98.8           -              ok        
+Stefan-Only            4.1517     3.4999     -0.0351  0.0            -              ok        
+Random Forest          0.6175     0.4759     0.9771   98.8           -              ok        
+XGBoost                0.6136     0.4776     0.9774   99.1           -              ok        
+

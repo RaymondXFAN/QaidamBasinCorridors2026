@@ -1,0 +1,104 @@
+Per-Model Diagnostic Information
+======================================================================
+
+Model: Geo-FiLM ST-GAT
+----------------------------------------
+  Status: ok
+  model: Geo-FiLM ST-GAT
+  rmse: 0.7448588061788695
+  mae: 0.538888734346151
+  r2: 0.9801339292081475
+  phys_violation_rate: 99.0
+  eval_time_sec: 0.026118755340576172
+  train_time_sec: 43.85058856010437
+  film_improvement: -4.997312650497386
+
+Model: Standard ST-GAT
+----------------------------------------
+  Status: ok
+  model: Standard ST-GAT
+  rmse: 0.709407495654929
+  mae: 0.5391357357541466
+  r2: 0.981979965779983
+  phys_violation_rate: 97.875
+  eval_time_sec: 0.02718806266784668
+  train_time_sec: 42.88081359863281
+
+Model: ST-GCN
+----------------------------------------
+  Status: ok
+  model: ST-GCN
+  rmse: 0.7457982518089573
+  mae: 0.5657526313457928
+  r2: 0.9800837858452541
+  phys_violation_rate: 98.875
+  eval_time_sec: 0.02820587158203125
+  train_time_sec: 38.35253596305847
+
+Model: DCRNN
+----------------------------------------
+  Status: ok
+  model: DCRNN
+  rmse: 0.7568258315089553
+  mae: 0.5694442057133741
+  r2: 0.9794904581565558
+  phys_violation_rate: 99.125
+  eval_time_sec: 0.03178548812866211
+  train_time_sec: 47.71895694732666
+
+Model: PINN-Permafrost
+----------------------------------------
+  Status: ok
+  model: PINN-Permafrost
+  rmse: 1.2902549529661964
+  mae: 1.006992025499335
+  r2: 0.9000252651262504
+  phys_violation_rate: 98.75
+  eval_time_sec: 0.004705667495727539
+  train_time_sec: 1.6492867469787598
+
+Model: Stefan-Only
+----------------------------------------
+  Status: ok
+  model: Stefan-Only
+  rmse: 4.151705465979714
+  mae: 3.4998591769110323
+  r2: -0.03512372555936549
+  phys_violation_rate: 0.0
+  eval_time_sec: 0.0004119873046875
+  train_time_sec: 0.00010609626770019531
+
+Model: Random Forest
+----------------------------------------
+  Status: ok
+  model: Random Forest
+  rmse: 0.617502296330925
+  mae: 0.47590373479530856
+  r2: 0.9771010090623568
+  phys_violation_rate: 98.75
+  eval_time_sec: 0.0902092456817627
+  train_time_sec: 2.214613676071167
+
+Model: XGBoost
+----------------------------------------
+  Status: ok
+  model: XGBoost
+  rmse: 0.6136103200855535
+  mae: 0.4776481473241651
+  r2: 0.9773887536438312
+  phys_violation_rate: 99.125
+  eval_time_sec: 0.0013833045959472656
+  train_time_sec: 1.815506935119629
+
+
+Device Information
+----------------------------------------
+  PyTorch version: 2.4.0+cu124
+  CUDA available: True
+  CUDA device: NVIDIA GeForce RTX 4090 D
+  CUDA memory: 25.3 GB
+
+  Config device: cuda
+  Config epochs: 200
+  Config lr: 0.001
+  Config batch_size: 32

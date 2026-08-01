@@ -1,0 +1,373 @@
+
+======================================================================
+  Retrospective Prediction Experiment
+  Geo-FiLM ST-GAT Validation on Public Permafrost Data
+======================================================================
+  Time: 2026-08-01 13:15:11
+  Config: configs/autodl_gpu.yaml
+  Verbose level: 1
+  DATA_ROOT: /root/autodl-tmp
+  Project root: /root/retrospective_prediction
+  → Data/outputs on AutoDL data disk: /root/autodl-tmp
+
+[Step 1/5] Loading YAML config...
+[Preprocess] 加载配置: /root/retrospective_prediction/configs/autodl_gpu.yaml
+  dataset_name: autodl_gpu_simulation
+  N_nodes: 40, T_steps: 120
+  Dataset: autodl_gpu_simulation
+  Region: Simulation Fallback (AutoDL GPU)
+  Device: cuda
+  Dimensions: N=40, T=120, F=12, G=3
+  Data source: simulation
+
+[Step 2/5] Data acquisition...
+  Generating simulation data (Stefan equation driven)...
+[SyntheticGenerator] 生成仿真数据集: autodl_gpu_simulation
+  区域: Simulation Fallback (AutoDL GPU)
+  N=40, T=120, F=12, G=3
+  T_in=24, T_out=1, seed=42
+[SyntheticGenerator] 邻接矩阵: 78 条边 (阈值=50.0km, 平均度=3.9)
+[SyntheticGenerator] 数据维度:
+  X.shape = (40, 120, 12)  (N, T, F)
+  y.shape = (40, 120)  (N, T)
+  adj_matrix.shape = (40, 40)  (N, N)
+  geo_features.shape = (40, 3)  (N, G)
+  coords.shape = (40, 2)  (N, 2)
+  split_idx = 96  (train: 0~96, test: 96~120)
+[SyntheticGenerator] ALT统计:
+  min ALT = 2.052 m
+  max ALT = 2.809 m
+  mean ALT = 2.390 m
+[Preprocess] 数据已保存至: /root/autodl-tmp/datasets/processed/autodl_gpu_simulation.npz (578.9 KB)
+  Simulation data saved: /root/autodl-tmp/datasets/processed/autodl_gpu_simulation.npz
+  Data source type: simulation
+     X.shape = (40, 120, 12)
+     y.shape = (40, 120)
+     adj_matrix.shape = (40, 40)
+     geo_features.shape = (40, 3)
+
+[Step 3/5] Data preprocessing...
+  Feature normalization: method=zscore
+[Preprocess] 特征标准化: method=zscore, shape (40, 120, 12) -> (40, 120, 12)
+  Time split: T_in=24, T_out=1, train_ratio=0.8
+[Preprocess] 时间分割: train_ratio=0.8
+  [Flat]  X_train.shape = (3040, 24, 12)  (N*W_train, T_in, F)
+  [Flat]  y_train.shape = (3040, 1)  (N*W_train, T_out)
+  [Flat]  X_test.shape = (800, 24, 12)   (N*W_test, T_in, F)
+  [Flat]  y_test.shape = (800, 1)   (N*W_test, T_out)
+  [Graph] X_train_graph.shape = (76, 40, 24, 12)  (W_train, N, T_in, F)
+  [Graph] y_train_graph.shape = (76, 40, 1)  (W_train, N, T_out)
+  [Graph] X_test_graph.shape = (20, 40, 24, 12)   (W_test, N, T_in, F)
+  [Graph] y_test_graph.shape = (20, 40, 1)   (W_test, N, T_out)
+  adj_matrix.shape = (40, 40)
+  geo_features.shape = (40, 3)
+  总窗口数: 96, 训练窗口: 76, 测试窗口: 20
+
+  Dimension validation:
+[Preprocess] 数据校验:
+  X.shape = (3040, 24, 12)
+  y.shape = (3040, 1)
+  adj_matrix.shape = (40, 40)
+  geo_features.shape = (40, 3)
+  注意: X.shape[0]=3040 != adj.shape[0]=40 (可能是滑动窗口展开后的样本数)
+  [OK] 数据校验通过 ✓
+
+  ===========================================
+  Dynamic dimension override (AutoDL safety)
+  ===========================================
+  config F_features = 12  ->  actual input_dim = 12
+  config G_geo_features = 3  ->  actual geo_dim = 3
+  ===========================================
+  Feature dimension consistent (12)
+  geo dimension consistent (3)
+
+[Step 4/5] Running all model comparison experiments...
+  Models: Geo-FiLM ST-GAT | Standard ST-GAT | ST-GCN | DCRNN | PINN | Stefan | RF | XGBoost
+
+############################################################
+# Model: Geo-FiLM ST-GAT
+############################################################
+[Experiment] data_format=graph
+
+============================================================
+  Training: Geo-FiLM ST-GAT
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[Geo-FiLM ST-GAT] Graph-format data: W=76, N=40, T_in=24, F=12
+[Geo-FiLM ST-GAT] adj_matrix=(40, 40), geo_features=(40, 3)
+[Geo-FiLM ST-GAT] ⚡ GAT attention: 40×40 nodes (NOT 3040×3040 — OOM avoided!)
+[Geo-FiLM ST-GAT] Using device: cuda
+Epoch 1/200 | avg_loss=14.3217 | PhysViol=100.0% | γ=[1.00,1.00] β=[-34.21,31.45] film_scale_raw=-2.20 sigmoid=0.0996
+Epoch 50/200 | avg_loss=1.7346 | PhysViol=97.7% | γ=[1.00,1.00] β=[-163.65,134.42] film_scale_raw=-2.24 sigmoid=0.0960
+Epoch 100/200 | avg_loss=1.3686 | PhysViol=97.7% | γ=[1.00,1.00] β=[-150.95,124.23] film_scale_raw=-2.25 sigmoid=0.0954
+Epoch 150/200 | avg_loss=1.3297 | PhysViol=97.5% | γ=[1.00,1.00] β=[-152.52,120.11] film_scale_raw=-2.25 sigmoid=0.0953
+Epoch 200/200 | avg_loss=1.3275 | PhysViol=98.3% | γ=[1.00,1.00] β=[-153.27,119.25] film_scale_raw=-2.25 sigmoid=0.0953
+[Geo-FiLM ST-GAT] Training complete. Best loss: 1.3009
+[Trainer] Geo-FiLM ST-GAT trained in 43.9s
+
+============================================================
+  Evaluating: Geo-FiLM ST-GAT
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[Geo-FiLM ST-GAT] RMSE=0.7449 MAE=0.5389 R²=0.9801 PhysViol=99.0%
+[Trainer] Geo-FiLM ST-GAT evaluated in 0.0s
+
+############################################################
+# Model: Standard ST-GAT
+############################################################
+[Experiment] data_format=graph
+
+============================================================
+  Training: Standard ST-GAT
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[Standard ST-GAT] Graph-format data: W=76, N=40, T_in=24, F=12
+[Standard ST-GAT] adj_matrix=(40, 40), geo_features=(40, 3)
+[Standard ST-GAT] ⚡ GAT attention: 40×40 nodes (NOT 3040×3040 — OOM avoided!)
+[Standard ST-GAT] Using device: cuda
+Epoch 1/200 | avg_loss=14.3325 | PhysViol=7.7%
+Epoch 50/200 | avg_loss=1.4024 | PhysViol=98.1%
+Epoch 100/200 | avg_loss=1.2931 | PhysViol=98.1%
+Epoch 150/200 | avg_loss=1.2641 | PhysViol=97.9%
+Epoch 200/200 | avg_loss=1.2721 | PhysViol=96.9%
+[Standard ST-GAT] Training complete. Best loss: 1.2401
+[Trainer] Standard ST-GAT trained in 42.9s
+
+============================================================
+  Evaluating: Standard ST-GAT
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[Standard ST-GAT] RMSE=0.7094 MAE=0.5391 R²=0.9820 PhysViol=97.9%
+[Trainer] Standard ST-GAT evaluated in 0.0s
+
+############################################################
+# Model: ST-GCN
+############################################################
+[Experiment] data_format=graph
+
+============================================================
+  Training: ST-GCN
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[ST-GCN] Graph-format data: W=76, N=40, T_in=24, F=12
+[ST-GCN] adj_matrix=(40, 40), geo_features=(40, 3)
+[ST-GCN] Using device: cuda
+Epoch 1/200 | avg_loss=14.3103 | PhysViol=100.0%
+Epoch 50/200 | avg_loss=1.6473 | PhysViol=98.1%
+Epoch 100/200 | avg_loss=1.4558 | PhysViol=97.9%
+Epoch 150/200 | avg_loss=1.4320 | PhysViol=98.5%
+Epoch 200/200 | avg_loss=1.3979 | PhysViol=97.1%
+[ST-GCN] Training complete. Best loss: 1.3607
+[Trainer] ST-GCN trained in 38.4s
+
+============================================================
+  Evaluating: ST-GCN
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[ST-GCN] RMSE=0.7458 MAE=0.5658 R²=0.9801 PhysViol=98.9%
+[Trainer] ST-GCN evaluated in 0.0s
+
+############################################################
+# Model: DCRNN
+############################################################
+[Experiment] data_format=graph
+
+============================================================
+  Training: DCRNN
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[DCRNN] Graph-format data: W=76, N=40, T_in=24, F=12
+[DCRNN] adj_matrix=(40, 40), geo_features=(40, 3)
+[DCRNN] Using device: cuda
+Epoch 1/200 | avg_loss=14.4016 | PhysViol=94.2%
+Epoch 50/200 | avg_loss=1.3607 | PhysViol=97.7%
+Epoch 100/200 | avg_loss=1.2545 | PhysViol=99.0%
+Epoch 150/200 | avg_loss=1.2333 | PhysViol=98.5%
+Epoch 200/200 | avg_loss=1.2045 | PhysViol=98.3%
+[DCRNN] Training complete. Best loss: 1.1955
+[Trainer] DCRNN trained in 47.7s
+
+============================================================
+  Evaluating: DCRNN
+============================================================
+[Trainer] Data format: graph -> (W=76, N=40, T_in=24, F=12)
+[DCRNN] RMSE=0.7568 MAE=0.5694 R2=0.9795 PhysViol=99.1%
+[Trainer] DCRNN evaluated in 0.0s
+
+############################################################
+# Model: PINN-Permafrost
+############################################################
+[Experiment] data_format=flat
+
+============================================================
+  Training: PINN-Permafrost
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[PINN-Permafrost] Data dimensions: input_dim=12, geo_dim=3, N_train=3040, T=24
+[PINN-Permafrost] Using device: cuda
+Epoch 50/200 | L_pred=3.1021 L_stefan=2.3424 L_thermal=0.0022 L_total=4.6265 | PhysViol=98.7%
+Epoch 100/200 | L_pred=1.6920 L_stefan=0.8384 L_thermal=0.0009 L_total=2.8202 | PhysViol=98.6%
+Epoch 150/200 | L_pred=1.5104 L_stefan=0.4592 L_thermal=0.0006 L_total=2.5435 | PhysViol=98.3%
+Epoch 200/200 | L_pred=1.5194 L_stefan=0.4140 L_thermal=0.0006 L_total=2.5297 | PhysViol=98.7%
+[PINN-Permafrost] Training complete. Best loss: 2.4535
+[Trainer] PINN-Permafrost trained in 1.6s
+
+============================================================
+  Evaluating: PINN-Permafrost
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[PINN-Permafrost] RMSE=1.2903 MAE=1.0070 R²=0.9000 PhysViol=98.8%
+[Trainer] PINN-Permafrost evaluated in 0.0s
+
+############################################################
+# Model: Stefan-Only
+############################################################
+[Experiment] data_format=flat
+
+============================================================
+  Training: Stefan-Only
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[Stefan-Only] Pure physics model — no training required.
+[Stefan-Only] Data dimensions: N_train=3040, T=24, F=12
+[Stefan-Only] Parameters: k_thaw=1.2, L=3.34e+07, factor=0.5
+[Stefan-Only] Model ready for prediction.
+[Trainer] Stefan-Only trained in 0.0s
+
+============================================================
+  Evaluating: Stefan-Only
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[Stefan-Only] RMSE=4.1517 MAE=3.4999 R²=-0.0351 PhysViol=0.0%
+[Trainer] Stefan-Only evaluated in 0.0s
+
+############################################################
+# Model: Random Forest
+############################################################
+[Experiment] data_format=flat
+
+============================================================
+  Training: Random Forest
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[Random Forest] Flattening input: (3040, 24, 12) → (3040, 288)
+[Random Forest] Training with n_estimators=100, max_depth=10
+[Random Forest] Input shape: (3040, 288), Target shape: (3040,)
+[Random Forest] Training R²: 0.9952
+[Trainer] Random Forest trained in 2.2s
+
+============================================================
+  Evaluating: Random Forest
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[Random Forest] Flattening input: (800, 24, 12) → (800, 288)
+[Random Forest] RMSE=0.6175 MAE=0.4759 R²=0.9771 PhysViol=98.8%
+[Trainer] Random Forest evaluated in 0.1s
+
+############################################################
+# Model: XGBoost
+############################################################
+[Experiment] data_format=flat
+
+============================================================
+  Training: XGBoost
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[XGBoost] Flattening input: (3040, 24, 12) → (3040, 288)
+[XGBoost] Training with n_estimators=200, max_depth=6, learning_rate=0.1
+[XGBoost] Input shape: (3040, 288), Target shape: (3040,)
+[XGBoost] Training R²: 0.9991
+[Trainer] XGBoost trained in 1.8s
+
+============================================================
+  Evaluating: XGBoost
+============================================================
+[Trainer] Data format: flat -> X_train (3040, 24, 12)
+[XGBoost] Flattening input: (800, 24, 12) → (800, 288)
+[XGBoost] RMSE=0.6136 MAE=0.4776 R²=0.9774 PhysViol=99.1%
+[Trainer] XGBoost evaluated in 0.0s
+
+[FiLM Improvement] Geo-FiLM vs Standard ST-GAT: -5.0% RMSE reduction
+
+============================================================
+  Results Summary
+============================================================
+Model                  RMSE(m)    MAE(m)     R2       PhysViol(%)    FiLMImp(%)     Status    
+----------------------------------------------------------------------------------------------
+Geo-FiLM ST-GAT        0.7449     0.5389     0.9801   99.0           -5.0           ok        
+Standard ST-GAT        0.7094     0.5391     0.9820   97.9           -              ok        
+ST-GCN                 0.7458     0.5658     0.9801   98.9           -              ok        
+DCRNN                  0.7568     0.5694     0.9795   99.1           -              ok        
+PINN-Permafrost        1.2903     1.0070     0.9000   98.8           -              ok        
+Stefan-Only            4.1517     3.4999     -0.0351  0.0            -              ok        
+Random Forest          0.6175     0.4759     0.9771   98.8           -              ok        
+XGBoost                0.6136     0.4776     0.9774   99.1           -              ok        
+[Results] Plain text results saved to /root/autodl-tmp/outputs/experiment_results.txt
+[Results] CSV results saved to /root/autodl-tmp/outputs/experiment_results.csv
+[Results] Diagnostics saved to /root/autodl-tmp/outputs/diagnostics.txt
+
+  All experiments completed in 178.7s (3.0min)
+
+[Step 5/5] Saving results...
+  Plain text results: /root/autodl-tmp/outputs/experiment_results.txt
+  CSV results: /root/autodl-tmp/outputs/experiment_results.csv
+
+  Physical constraint check (Stefan equation validation):
+[Physical Constraint Check] Violation rate: 98.5% (788/800)
+  Mean violation magnitude: 4.0044
+  Max violation magnitude: 12.6806
+    Geo-FiLM ST-GAT: violation rate 98.5%
+[Physical Constraint Check] Violation rate: 97.8% (782/800)
+  Mean violation magnitude: 3.9868
+  Max violation magnitude: 13.2658
+    Standard ST-GAT: violation rate 97.75%
+[Physical Constraint Check] Violation rate: 98.4% (787/800)
+  Mean violation magnitude: 3.9235
+  Max violation magnitude: 14.4679
+    ST-GCN: violation rate 98.375%
+[Physical Constraint Check] Violation rate: 98.6% (789/800)
+  Mean violation magnitude: 3.9031
+  Max violation magnitude: 12.5772
+    DCRNN: violation rate 98.625%
+[Physical Constraint Check] Violation rate: 98.8% (790/800)
+  Mean violation magnitude: 2.8750
+  Max violation magnitude: 6.7007
+    PINN-Permafrost: violation rate 98.75%
+[Physical Constraint Check] Violation rate: 0.0% (0/800)
+    Stefan-Only: violation rate 0.0%
+[Physical Constraint Check] Violation rate: 98.8% (790/800)
+  Mean violation magnitude: 3.4683
+  Max violation magnitude: 10.7460
+    Random Forest: violation rate 98.75%
+[Physical Constraint Check] Violation rate: 99.1% (793/800)
+  Mean violation magnitude: 3.4218
+  Max violation magnitude: 11.1389
+    XGBoost: violation rate 99.125%
+
+======================================================================
+  Experiment Results Summary
+======================================================================
+Model                  RMSE(m)    MAE(m)     R2       PhysViol(%)    FiLMImp(%)     Status    
+----------------------------------------------------------------------------------------------
+Geo-FiLM ST-GAT        0.7449     0.5389     0.9801   99.0           -5.0           ok        
+Standard ST-GAT        0.7094     0.5391     0.9820   97.9           -              ok        
+ST-GCN                 0.7458     0.5658     0.9801   98.9           -              ok        
+DCRNN                  0.7568     0.5694     0.9795   99.1           -              ok        
+PINN-Permafrost        1.2903     1.0070     0.9000   98.8           -              ok        
+Stefan-Only            4.1517     3.4999     -0.0351  0.0            -              ok        
+Random Forest          0.6175     0.4759     0.9771   98.8           -              ok        
+XGBoost                0.6136     0.4776     0.9774   99.1           -              ok        
+
+  Result files:
+     TXT: /root/autodl-tmp/outputs/experiment_results.txt
+     CSV: /root/autodl-tmp/outputs/experiment_results.csv
+     Data: /root/autodl-tmp/datasets/processed/autodl_gpu_simulation.npz
+
+  Next steps:
+     1. Check outputs/experiment_results.txt
+     2. Use CSV data for paper Table X
+     3. If real data available, re-run: python run_main.py --config configs/qaidam_inSAR.yaml
+
+======================================================================
+  Experiment completed
+======================================================================

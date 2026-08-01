@@ -1,0 +1,18 @@
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
+matplotlib>=3.7.0
+pyyaml>=6.0
+xgboost>=1.7.0
+torch>=2.4.0
+# ============================================================
+# 环境兼容性说明：
+#   RTX4090 | CUDA Driver 13.0 | PyTorch CUDA Runtime 12.4
+#   Python 3.12 | NVIDIA-SMI 580.105.08
+#   Driver CUDA 13.0 >= Runtime CUDA 12.4 ✓ (向下兼容)
+#   torch>=2.4.0 匹配 cu124 (PyTorch 2.4+cu24)
+# ============================================================
+# ⚠️ AutoDL环境通常已预装PyTorch+CUDA，pip install时跳过torch
+#    如果需要重装torch，使用：
+#    pip install torch>=2.4.0 --index-url https://download.pytorch.org/whl/cu124
